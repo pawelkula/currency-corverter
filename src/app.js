@@ -30,26 +30,28 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <>
-        <Box className='app-bar' position='static'>
-          <Logo />
-          <StyledTabs
-            centered
-            onChange={handleChange}
-            value={value}
-            aria-label="tabs"
-          >
-            <StyledTab
-              label='Currency PanelConverter'
-              {...a11yProps(0)}
-            />
-            <StyledTab
-              label='View conversation history'
-              {...a11yProps(1)}
-            />
-          </StyledTabs>
-          <StyledLogout>
-            Logout
-          </StyledLogout>
+        <Box className="app-bar">
+          <Box className='app-bar-content' position='static'>
+            <Logo />
+            <StyledTabs
+              centered
+              onChange={handleChange}
+              value={value}
+              aria-label="tabs"
+            >
+              <StyledTab
+                label='Currency converter'
+                {...a11yProps(0)}
+              />
+              <StyledTab
+                label='View conversation history'
+                {...a11yProps(1)}
+              />
+            </StyledTabs>
+            <StyledLogout>
+              Logout
+            </StyledLogout>
+          </Box>
         </Box>
         <Box className="app-container">
           <TabPanel value={value} index={0}>

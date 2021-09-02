@@ -1,8 +1,14 @@
 .app-bar {
+  background-color: white;
+}
+
+.app-bar-content {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   margin: 0 auto;
-  max-width: 1000px;
+  padding-top: 10px;
+  max-width: var(--maxPageWidth);
+  background-color: white;
 }
