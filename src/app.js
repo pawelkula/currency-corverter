@@ -14,7 +14,6 @@ function App() {
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
-    console.log('Change: ', newValue);
     setValue(newValue);
   };
 
@@ -24,8 +23,6 @@ function App() {
       'aria-controls': `tabpanel-${index}`,
     };
   }
-
-  console.log('value', value);
 
   return (
     <ThemeProvider theme={theme}>

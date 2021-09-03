@@ -11,7 +11,13 @@ export const theme = createTheme({
       main: '#009688',
       dark: '#404040',
     },
+    secondary: {
+      main: '#94C720',
+    },
     type: 'light',
+    error: {
+      main: '#C70D38'
+    }
   },
   typography: {
     fontSize: 16
