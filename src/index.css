@@ -1,5 +1,5 @@
 :root {
-  --maxPageWidth: 1000px
+  --maxPageWidth: 1000px;
 }
 
 body {
@@ -10,9 +10,15 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #f6f6f6;
+  color: #404040;
 }
 
 h1 {
   font-size: 48px;
+  font-weight: bold;
+}
+
+h2 {
+  font-size: 24px;
   font-weight: bold;
 }

@@ -4,6 +4,7 @@ import CompareArrowsTwoToneIcon from '@material-ui/icons/CompareArrowsTwoTone';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import currencies from '../../data/currencies.json';
 import { Error } from '../error/error';
+import { ExchangeHistory } from '../exchange-history/exchange-history';
 import './panel-converter.css';
 import { ConversionResult } from '../conversion-result/conversion-result';
 
@@ -81,10 +82,6 @@ export function PanelConverter() {
     }
   }
 
-  console.log('amount', amount);
-  console.log('selectedTo', selectedTo);
-  console.log('selectedFrom', selectedFrom);
-
   return (
     <Box className='panel-converter'>
       <h1>I want to convert</h1>
@@ -137,7 +134,7 @@ export function PanelConverter() {
             </Button>
           </Box>
         </Box>
-        <Box style={{ marginTop: '50px' }}>
+        <Box style={{ marginTop: '50px', height: '100px' }}>
           {
             errorMessage
               ? (<Error message={errorMessage} />)
@@ -150,6 +147,11 @@ export function PanelConverter() {
                 />
               )
           }
+        </Box>
+        <Box style={{ marginTop: '50px' }}>
+          <ExchangeHistory
+            selectedCurrency={selectedFrom}
+          />
         </Box>
       </Box>
     </Box>

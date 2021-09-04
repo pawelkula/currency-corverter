@@ -1,0 +1,3 @@
+export const INITIAL_EXCHANGE_DISPLAY_MODE = 'table';
+
+export const INITIAL_EXCHANGE_HISTORY_TIME_FRAME = 7;
