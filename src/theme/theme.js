@@ -12,6 +12,9 @@ export const theme = createTheme({
       dark: '#404040',
     },
     secondary: {
+      main: '#FFFFFF',
+    },
+    info: {
       main: '#94C720',
     },
     type: 'light',
