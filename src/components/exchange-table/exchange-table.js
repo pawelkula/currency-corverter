@@ -20,7 +20,7 @@ export function ExchangeTable({ exchangeData }) {
             {exchangeData.map((row, index) => (
               <TableRow key={`row${index}`}>
                 <TableCell>{format(parseISO(row.timestamp), 'yyyy/MM/dd')}</TableCell>
-                <TableCell>{(parseFloat(row.rate)).toFixed(7)}</TableCell>
+                <TableCell>{row.rate.toFixed(7)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -33,6 +33,6 @@ export function ExchangeTable({ exchangeData }) {
 ExchangeTable.propTypes = {
   exchangeData: PropTypes.arrayOf(PropTypes.shape({
     timestamp: PropTypes.string,
-    rate: PropTypes.string,
+    rate: PropTypes.number,
   }))
 };

@@ -5,21 +5,19 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import currencies from '../../data/currencies.json';
 import { Error } from '../error/error';
 import { ExchangeHistory } from '../exchange-history/exchange-history';
-import './panel-converter.css';
 import { ConversionResult } from '../conversion-result/conversion-result';
-
-const CONVERSION_RESULT_ROUND = 3;
+import './panel-converter.css';
 
 function filterExchangeRates(data, currencies) {
-  return data.filter((el) => currencies.some(currency => currency.symbol === el.currency ? el : false))
+  return data.filter((el) => currencies.some(currency => currency === el.currency ? el : false))
 }
 
 export function PanelConverter() {
-  const [amount, setAmount] = useState(0);
-  const [selectedFrom, setSelectedFrom] = React.useState('');
-  const [selectedTo, setSelectedTo] = React.useState('');
+  const [amount, setAmount] = useState(500);
+  const [selectedFrom, setSelectedFrom] = React.useState('EUR');
+  const [selectedTo, setSelectedTo] = React.useState('USD');
   const [exchangeRatesInUSD, setExchangeRatesInUSD] = React.useState([]);
-  const [conversionResult, setConversionResult] = React.useState('');
+  const [rate, setRate] = React.useState(0);
   const [errorMessage, setErrorMessage] = React.useState('');
 
   useEffect(() => {
@@ -30,29 +28,30 @@ export function PanelConverter() {
         setExchangeRatesInUSD(rates);
       })
       .catch(e => {
-        setErrorMessage('Error: Cannot fetch currency rates...');
+        setErrorMessage('Error: Cannot fetch currency rates.');
       });
   }, []);
 
   function fromOnInputChange(e, value) {
     setSelectedFrom(value);
-    setConversionResult('');
+    setRate(0);
   }
 
   function toOnInputChange(e, value) {
     setSelectedTo(value);
-    setConversionResult('');
+    setRate(0);
   }
 
   function amountOnChange(e) {
     setAmount(e?.target?.value || '');
-    setConversionResult('');
+    setRate(0);
   }
 
   function handleSwitch() {
     if (selectedFrom && selectedTo) {
       setSelectedFrom(selectedTo);
-      setSelectedTo(selectedFrom)
+      setSelectedTo(selectedFrom);
+      setRate(0);
     }
   }
 
@@ -72,13 +71,14 @@ export function PanelConverter() {
     }
     setErrorMessage('');
 
-    const fromRateInUSD = parseFloat(exchangeRatesInUSD.find(el => el.currency === selectedFrom)['rate']);
-    const toRateInUSD = parseFloat(exchangeRatesInUSD.find(el => el.currency === selectedTo)['rate']);
-    const rate = fromRateInUSD / toRateInUSD;
-    const conversionAmount = (amount * rate).toFixed(CONVERSION_RESULT_ROUND);
+    if (exchangeRatesInUSD.length) {
+      const fromRateInUSD = parseFloat(exchangeRatesInUSD.find(el => el.currency === selectedFrom)['rate']);
+      const toRateInUSD = parseFloat(exchangeRatesInUSD.find(el => el.currency === selectedTo)['rate']);
+      const rate = fromRateInUSD / toRateInUSD;
 
-    if (!isNaN(rate)) {
-      setConversionResult(conversionAmount);
+      if (!isNaN(rate)) {
+        setRate(rate);
+      }
     }
   }
 
@@ -96,10 +96,11 @@ export function PanelConverter() {
           />
           <Autocomplete
             id='from'
+            value={selectedFrom}
             options={currencies}
             onInputChange={fromOnInputChange}
             inputValue={selectedFrom}
-            getOptionLabel={(option) => option.symbol}
+            getOptionLabel={(option) => option}
             style={{ marginRight: '30px', width: '100%' }}
             renderInput={(params) => <TextField {...params} label='From' />}
           />
@@ -116,10 +117,11 @@ export function PanelConverter() {
           </Box>
           <Autocomplete
             id='to'
+            value={selectedTo}
             options={currencies}
             inputValue={selectedTo}
             onInputChange={toOnInputChange}
-            getOptionLabel={(option) => option.symbol}
+            getOptionLabel={(option) => option}
             style={{ marginRight: '30px', width: '100%' }}
             renderInput={(params) => <TextField {...params} label='To' />}
           />
@@ -143,14 +145,16 @@ export function PanelConverter() {
                   amount={amount}
                   from={selectedFrom}
                   to={selectedTo}
-                  result={conversionResult}
+                  rate={rate}
                 />
               )
           }
         </Box>
-        <Box style={{ marginTop: '50px' }}>
+        <Box style={{ marginTop: '80px' }}>
           <ExchangeHistory
-            selectedCurrency={selectedFrom}
+            selectedFrom={selectedFrom}
+            selectedTo={selectedTo}
+            rate={rate}
           />
         </Box>
       </Box>

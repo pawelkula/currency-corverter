@@ -26,39 +26,61 @@ const GreenRadio = withStyles({
     },
   },
   checked: {},
-})((props) => <Radio color="default" {...props} />);
+})((props) => <Radio color='default' {...props} />);
 
-export function ExchangeHistory({ selectedCurrency }) {
+function calculateRatesHistory(data) {
+  try {
+    return data[0].map((el, index) => ({
+      timestamp: el.timestamp,
+      rate: (parseFloat(el.rate) / parseFloat(data[1][index]['rate'])),
+    }));
+  } catch (e) {
+    console.error('Error: Cannot calculate rates history');
+    return [];
+  }
+}
+
+export function ExchangeHistory({ rate, selectedFrom, selectedTo }) {
   const [timeFrame, setTimeFrame] = useState(INITIAL_EXCHANGE_HISTORY_TIME_FRAME);
   const [displayMode, setDisplayMode] = useState(INITIAL_EXCHANGE_DISPLAY_MODE);
   const [errorMessage, setErrorMessage] = useState('');
   const [exchangeData, setExchangeData] = useState([]);
 
-  useEffect(() => {
+  async function fetchAllExchangeRates(selectedFrom, selectedTo, timeFrame) {
+    setErrorMessage('');
+
     const now = new Date();
-    now.setUTCHours(0,0,0,0);
-
+    now.setUTCHours(0, 0, 0, 0);
     const startDate = format(now, 'yyyy-MM-dd');
-    const endDate = format(sub(now, { days: timeFrame - 1}), 'yyyy-MM-dd');
+    const endDate = format(sub(now, { days: timeFrame - 1 }), 'yyyy-MM-dd');
 
-    const API_URL = `https://api.nomics.com/v1/exchange-rates/history?key=${process.env.REACT_APP_API_KEY}&currency=${selectedCurrency}&start=${endDate}T00%3A00%3A00Z&end=${startDate}T00%3A00%3A00Z`;
+    const FROM_API_URL = `https://api.nomics.com/v1/exchange-rates/history?key=${process.env.REACT_APP_API_KEY}&currency=${selectedFrom}&start=${endDate}T00%3A00%3A00Z&end=${startDate}T00%3A00%3A00Z`;
+    const TO_API_URL = `https://api.nomics.com/v1/exchange-rates/history?key=${process.env.REACT_APP_API_KEY}&currency=${selectedTo}&start=${endDate}T00%3A00%3A00Z&end=${startDate}T00%3A00%3A00Z`;
 
-    if (selectedCurrency) {
-      fetch(API_URL)
+    const data = await Promise.all([
+      fetch(FROM_API_URL)
         .then(response => response.json())
-        .then(data => {
-          console.log('data hist');
-          console.log(data);
-          setExchangeData(data.reverse());
-        })
-        .catch(e => {
-          setErrorMessage('Error: Cannot fetch exchange rates...');
-        });
+        .then(data => data.reverse())
+        .catch(() => setErrorMessage('Error: Cannot fetch exchange rates.')),
+
+      fetch(TO_API_URL)
+        .then(response => response.json())
+        .then(data => data.reverse())
+        .catch(() => setErrorMessage('Error: Cannot fetch exchange rates.')),
+    ]);
+
+    return calculateRatesHistory(data);
+  }
+
+  useEffect(() => {
+    if (selectedFrom && selectedTo) {
+      fetchAllExchangeRates(selectedFrom, selectedTo, timeFrame)
+        .then(data => setExchangeData(data));
     }
-  }, [selectedCurrency, timeFrame])
+  }, [selectedFrom, selectedTo, timeFrame]);
 
   function handleSelectChange(e) {
-   setTimeFrame(e.target.value);
+    setTimeFrame(e.target.value);
   }
 
   function handleRadioChange(e) {
@@ -76,13 +98,13 @@ export function ExchangeHistory({ selectedCurrency }) {
           alignItems: 'center',
           justifyContent: 'space-between',
           marginBottom: '20px',
-          width: '50%'
+          width: '50%',
         }}
       >
         <FormControl>
-          <InputLabel htmlFor="exchangeHistorySelect">Duration</InputLabel>
+          <InputLabel htmlFor='exchangeHistorySelect'>Duration</InputLabel>
           <Select
-            id="exchangeHistorySelect"
+            id='exchangeHistorySelect'
             onChange={handleSelectChange}
             value={timeFrame}
             style={{ width: '180px' }}
@@ -92,16 +114,16 @@ export function ExchangeHistory({ selectedCurrency }) {
             <MenuItem value={30}>30 days</MenuItem>
           </Select>
         </FormControl>
-        <Box display="flex" flexDirection="row">
+        <Box display='flex' flexDirection='row'>
           <FormControl>
             <RadioGroup
               style={{ flexDirection: 'row' }}
-              name="display-mode-radio-group"
+              name='display-mode-radio-group'
               value={displayMode}
               onChange={handleRadioChange}
             >
-              <FormControlLabel value="table" control={<GreenRadio />} label="Table" />
-              <FormControlLabel value="chart" control={<GreenRadio />} label="Chart" />
+              <FormControlLabel value='table' control={<GreenRadio />} label='Table' />
+              <FormControlLabel value='chart' control={<GreenRadio />} label='Chart' />
             </RadioGroup>
           </FormControl>
         </Box>
@@ -109,7 +131,7 @@ export function ExchangeHistory({ selectedCurrency }) {
       <Box style={{ marginBottom: '100px' }}>
         {
           errorMessage
-            ? (<Error message={errorMessage}/>)
+            ? (<Error message={errorMessage} />)
             : (<ExchangeTable exchangeData={exchangeData} />)
         }
       </Box>

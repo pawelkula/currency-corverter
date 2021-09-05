@@ -1,10 +1,10 @@
 [
-  { "symbol": "CHF" },
-  { "symbol": "CZK" },
-  { "symbol": "EUR" },
-  { "symbol": "GBP" },
-  { "symbol": "JPY" },
-  { "symbol": "PLN" },
-  { "symbol": "USD" },
-  { "symbol": "UZS" }
+  "CHF",
+  "CZK",
+  "EUR",
+  "GBP",
+  "JPY",
+  "PLN",
+  "USD",
+  "UZS"
 ]
