@@ -53,11 +53,11 @@ function calculateStatistics(data) {
     return [
       { label: 'Lowest', rate: lowest },
       { label: 'Highest', rate: highest },
-      { label: 'Average', rate: average}
+      { label: 'Average', rate: average },
     ];
   } catch (e) {
     console.error('Error: Cannot calculate statistics.');
-    return []
+    return [];
   }
 }
 
@@ -79,33 +79,37 @@ export function ExchangeHistory({ rate, selectedFrom, selectedTo }) {
     const FROM_API_URL = `https://api.nomics.com/v1/exchange-rates/history?key=${process.env.REACT_APP_API_KEY}&currency=${selectedFrom}&start=${endDate}T00%3A00%3A00Z&end=${startDate}T00%3A00%3A00Z`;
     const TO_API_URL = `https://api.nomics.com/v1/exchange-rates/history?key=${process.env.REACT_APP_API_KEY}&currency=${selectedTo}&start=${endDate}T00%3A00%3A00Z&end=${startDate}T00%3A00%3A00Z`;
 
-    const data = await Promise.all([
-      fetch(FROM_API_URL)
-        .then(response => response.json())
-        .then(data => data.reverse())
-        .catch(() => setErrorMessage('Error: Cannot fetch exchange rates.')),
+    const data0 = await fetch(FROM_API_URL)
+      .then(response => response.json())
+      .then(data => data.reverse())
+      .catch(() => setErrorMessage('Error: Cannot fetch exchange rates.'));
 
+    // UGLY HACK to solve the issue with free nomics.com license:
+    // Error 429: too many calls if there are more than one API call per second...
+    // To see the original solution, check out the commit: 817ce5f
+    setTimeout(() => {
+      console.log('second call "/exchange-rates/history/" API after 1.1 sec...');
       fetch(TO_API_URL)
         .then(response => response.json())
-        .then(data => data.reverse())
-        .catch(() => setErrorMessage('Error: Cannot fetch exchange rates.')),
-    ]);
+        .then(data => {
+          const data1 = data.reverse();
 
-    const rateHistory = calculateRatesHistory(data);
+          const d = [data0, data1];
+          const rateHistory = calculateRatesHistory(d);
 
-    return {
-      history: rateHistory,
-      statistics: calculateStatistics(rateHistory)
-    };
+          setExchangeData(rateHistory);
+          setStatisticsData(calculateStatistics(rateHistory));
+
+          return null;
+
+        })
+        .catch(() => setErrorMessage('Error: Cannot fetch exchange rates.'));
+    }, 1100);
   }
 
   useEffect(() => {
     if (selectedFrom && selectedTo && rate !== 0) {
-      fetchAllExchangeRates(selectedFrom, selectedTo, timeFrame)
-        .then(data => {
-          setExchangeData(data.history);
-          setStatisticsData(data.statistics)
-        });
+      fetchAllExchangeRates(selectedFrom, selectedTo, timeFrame);
     } else {
       setExchangeData([]);
       setStatisticsData([]);
@@ -172,13 +176,13 @@ export function ExchangeHistory({ rate, selectedFrom, selectedTo }) {
                 display: 'flex',
                 flexDirection: 'row',
                 justifyContent: 'space-between',
-                width: '100%'
+                width: '100%',
               }}
             >
               {
                 displayMode === INITIAL_EXCHANGE_DISPLAY_MODE
                   ? (<ExchangeTable exchangeData={exchangeData} />)
-                  : (<ExchangeChart exchangeData={exchangeData} statisticsData={statisticsData}/>)
+                  : (<ExchangeChart exchangeData={exchangeData} statisticsData={statisticsData} />)
               }
               <ExchangeStatistics statisticsData={statisticsData} />
             </Box>)
