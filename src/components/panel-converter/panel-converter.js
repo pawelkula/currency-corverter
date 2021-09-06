@@ -2,14 +2,31 @@ import React, { useEffect, useState } from 'react';
 import { Box, Button, TextField } from '@material-ui/core';
 import CompareArrowsTwoToneIcon from '@material-ui/icons/CompareArrowsTwoTone';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import { format } from 'date-fns';
 import currencies from '../../data/currencies.json';
 import { Error } from '../error/error';
 import { ExchangeHistory } from '../exchange-history/exchange-history';
 import { ConversionResult } from '../conversion-result/conversion-result';
 import './panel-converter.css';
+import { LOCAL_STORAGE_KEY } from '../../constants/constants';
 
 function filterExchangeRates(data, currencies) {
   return data.filter((el) => currencies.some(currency => currency === el.currency ? el : false))
+}
+
+function createHistoryLogItem(amount, from, to) {
+  try {
+    const now = Date.now();
+    return {
+      id: format(now, 'yyyyMMddHHmmssSS'),
+      date: format(now, 'dd/MM/yyyy \'@\' HH:mm'),
+      label: `Converted an amount of ${amount} from ${from} to ${to}`
+    }
+  } catch (e) {
+    console.error('Cannot create a history log.');
+    return null;
+  }
+
 }
 
 export function PanelConverter() {
@@ -19,6 +36,7 @@ export function PanelConverter() {
   const [exchangeRatesInUSD, setExchangeRatesInUSD] = React.useState([]);
   const [rate, setRate] = React.useState(0);
   const [errorMessage, setErrorMessage] = React.useState('');
+  const [logItem, setLogItem] = React.useState(null);
 
   useEffect(() => {
     fetch(`https://api.nomics.com/v1/exchange-rates?key=${process.env.REACT_APP_API_KEY}`)
@@ -31,6 +49,20 @@ export function PanelConverter() {
         setErrorMessage('Error: Cannot fetch currency rates.');
       });
   }, []);
+
+  useEffect(() => {
+    if (logItem) {
+      try {
+        const localData = localStorage.getItem(LOCAL_STORAGE_KEY) || '';
+        const logsArr = localData ? JSON.parse(localData) : [];
+
+        logsArr.push(logItem);
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(logsArr));
+      } catch (e) {
+        console.error('Cannot save log item to localStorage');
+      }
+    }
+  }, [logItem])
 
   function fromOnInputChange(e, value) {
     setSelectedFrom(value);
@@ -78,6 +110,12 @@ export function PanelConverter() {
 
       if (!isNaN(rate)) {
         setRate(rate);
+
+        const newLogItem = createHistoryLogItem(amount, selectedFrom, selectedTo);
+
+        if (newLogItem) {
+          setLogItem(newLogItem);
+        }
       }
     }
   }

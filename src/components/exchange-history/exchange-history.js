@@ -107,6 +107,7 @@ export function ExchangeHistory({ rate, selectedFrom, selectedTo }) {
         });
     } else {
       setExchangeData([]);
+      setStatisticsData([]);
     }
   }, [selectedFrom, selectedTo, rate, timeFrame]);
 
@@ -117,6 +118,8 @@ export function ExchangeHistory({ rate, selectedFrom, selectedTo }) {
   function handleRadioChange(e) {
     setDisplayMode(e.target.value);
   }
+
+  if (!rate) return null;
 
   return (
     <Box style={{ borderTop: '1px solid grey' }}>
