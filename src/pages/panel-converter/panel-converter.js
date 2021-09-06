@@ -4,9 +4,9 @@ import CompareArrowsTwoToneIcon from '@material-ui/icons/CompareArrowsTwoTone';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { format } from 'date-fns';
 import currencies from '../../data/currencies.json';
-import { Error } from '../error/error';
-import { ExchangeHistory } from '../exchange-history/exchange-history';
-import { ConversionResult } from '../conversion-result/conversion-result';
+import { Error } from '../../components/error/error';
+import { ExchangeHistory } from '../../components/exchange-history/exchange-history';
+import { ConversionResult } from '../../components/conversion-result/conversion-result';
 import { LOCAL_STORAGE_KEY } from '../../constants/constants';
 import './panel-converter.css';
 
