@@ -6,8 +6,8 @@ import { StyledTab } from './components/styled-tab/styled-tab';
 import { StyledTabs } from './components/styled-tabs/styled-tabs';
 import { StyledLogout } from './components/styled-logout/styled-logout';
 import { TabPanel } from './components/tab-panel/tab-panel';
-import { PanelConverter } from './components/panel-converter/panel-converter';
-import { PanelHistory } from './components/panel-history/panel-history';
+import { PanelConverter } from './pages/panel-converter/panel-converter';
+import { PanelHistory } from './pages/panel-history/panel-history';
 import './app.css';
 
 const initialConversionParams = {
