@@ -20,7 +20,9 @@ function createHistoryLogItem(amount, from, to) {
     return {
       id: format(now, 'yyyyMMddHHmmssSS'),
       date: format(now, 'dd/MM/yyyy \'@\' HH:mm'),
-      label: `Converted an amount of ${amount} from ${from} to ${to}`
+      amount,
+      from,
+      to
     }
   } catch (e) {
     console.error('Cannot create a history log.');
@@ -28,10 +30,10 @@ function createHistoryLogItem(amount, from, to) {
   }
 }
 
-export function PanelConverter() {
-  const [amount, setAmount] = useState(500);
-  const [selectedFrom, setSelectedFrom] = React.useState('EUR');
-  const [selectedTo, setSelectedTo] = React.useState('USD');
+export function PanelConverter({ conversionParams, executeConversion }) {
+  const [amount, setAmount] = useState(conversionParams.amount);
+  const [selectedFrom, setSelectedFrom] = React.useState(conversionParams.from);
+  const [selectedTo, setSelectedTo] = React.useState(conversionParams.to);
   const [exchangeRatesInUSD, setExchangeRatesInUSD] = React.useState([]);
   const [rate, setRate] = React.useState(0);
   const [errorMessage, setErrorMessage] = React.useState('');
@@ -62,6 +64,12 @@ export function PanelConverter() {
       }
     }
   }, [logItem])
+
+  useEffect(() => {
+    if (executeConversion) {
+      handleConvert();
+    }
+  }, [executeConversion, exchangeRatesInUSD])
 
   function fromOnInputChange(e, value) {
     setSelectedFrom(value);

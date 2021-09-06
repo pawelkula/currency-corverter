@@ -7,7 +7,7 @@ import { LOCAL_STORAGE_KEY } from '../../constants/constants';
 import { theme } from '../../theme/theme';
 import './panel-history.css';
 
-export function PanelHistory() {
+export function PanelHistory({ onLogItemClick }) {
   const [logs, setLogs] = useState([]);
   const [hoveringId, setHoveringId] = useState('');
 
@@ -69,7 +69,9 @@ export function PanelHistory() {
                       onMouseLeave={handleMouseOut}
                     >
                       <TableCell>{row.date}</TableCell>
-                      <TableCell>{row.label}</TableCell>
+                      <TableCell>
+                        {`Converted an amount of ${row.amount} from ${row.from} to ${row.to}`}
+                      </TableCell>
                       <TableCell>
                         {
                           (row.id) && (
@@ -77,6 +79,7 @@ export function PanelHistory() {
                               display: 'flex'
                             }}>
                               <Box
+                                onClick={() => onLogItemClick(row)}
                                 style={{
                                   display: 'flex',
                                   alignItems: 'center',

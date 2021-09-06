@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, ThemeProvider } from '@material-ui/core';
 import { theme } from './theme/theme';
 import { Logo } from './components/logo/logo';
@@ -7,15 +7,30 @@ import { StyledTabs } from './components/styled-tabs/styled-tabs';
 import { StyledLogout } from './components/styled-logout/styled-logout';
 import { TabPanel } from './components/tab-panel/tab-panel';
 import { PanelConverter } from './components/panel-converter/panel-converter';
-import './app.css';
 import { PanelHistory } from './components/panel-history/panel-history';
+import './app.css';
+
+const initialConversionParams = {
+  amount: 500,
+  from: 'EUR',
+  to: 'USD'
+}
 
 function App() {
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = useState(0);
+  const [conversionParams, setConversionParams] = useState(initialConversionParams);
+  const [executeConversion, setExecuteConversion] = useState(false);
 
-  const handleChange = (event, newValue) => {
+  function handleChange(event, newValue) {
+    setExecuteConversion(false);
     setValue(newValue);
-  };
+  }
+
+  function handleLogItemClick(params) {
+    setConversionParams(params);
+    setValue(0);
+    setExecuteConversion(true);
+  }
 
   function a11yProps(index) {
     return {
@@ -52,10 +67,15 @@ function App() {
         </Box>
         <Box className="app-container">
           <TabPanel value={value} index={0}>
-            <PanelConverter />
+            <PanelConverter
+              conversionParams={conversionParams}
+              executeConversion={executeConversion}
+            />
           </TabPanel>
           <TabPanel value={value} index={1}>
-            <PanelHistory />
+            <PanelHistory
+              onLogItemClick={handleLogItemClick}
+            />
           </TabPanel>
         </Box>
       </>
