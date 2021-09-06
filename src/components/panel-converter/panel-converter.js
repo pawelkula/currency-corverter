@@ -39,16 +39,20 @@ export function PanelConverter({ conversionParams, executeConversion }) {
   const [errorMessage, setErrorMessage] = React.useState('');
   const [logItem, setLogItem] = React.useState(null);
 
-  useEffect(() => {
-    fetch(`https://api.nomics.com/v1/exchange-rates?key=${process.env.REACT_APP_API_KEY}`)
+  const fetchData = async () => {
+    const result = await fetch(`https://api.nomics.com/v1/exchange-rates?key=${process.env.REACT_APP_API_KEY}`)
       .then(response => response.json())
       .then(data => {
-        const rates = filterExchangeRates(data, currencies);
-        setExchangeRatesInUSD(rates);
+        return filterExchangeRates(data, currencies);
       })
       .catch(e => {
         setErrorMessage('Error: Cannot fetch currency rates.');
       });
+    setExchangeRatesInUSD(result);
+  }
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -108,6 +112,7 @@ export function PanelConverter({ conversionParams, executeConversion }) {
       setErrorMessage('Please select the target currency');
       return;
     }
+
     setErrorMessage('');
 
     if (exchangeRatesInUSD.length) {

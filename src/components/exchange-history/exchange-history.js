@@ -20,6 +20,7 @@ import { Error } from '../error/error';
 import { ExchangeTable } from '../exchange-table/exchange-table';
 import { ExchangeStatistics } from '../exchange-statistics/exchange-statistics';
 import { arrayAverage } from '../../utils/array';
+import { ExchangeChart } from '../exchange-chart/exchange-chart';
 
 const GreenRadio = withStyles({
   root: {
@@ -174,7 +175,11 @@ export function ExchangeHistory({ rate, selectedFrom, selectedTo }) {
                 width: '100%'
               }}
             >
-              <ExchangeTable exchangeData={exchangeData} />
+              {
+                displayMode === INITIAL_EXCHANGE_DISPLAY_MODE
+                  ? (<ExchangeTable exchangeData={exchangeData} />)
+                  : (<ExchangeChart exchangeData={exchangeData} statisticsData={statisticsData}/>)
+              }
               <ExchangeStatistics statisticsData={statisticsData} />
             </Box>)
         }
