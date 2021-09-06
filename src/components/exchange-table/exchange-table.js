@@ -5,10 +5,10 @@ import Paper from '@material-ui/core/Paper';
 import { theme } from '../../theme/theme';
 import { format, parseISO } from 'date-fns';
 
-export function ExchangeTable({ exchangeData }) {
+export function ExchangeTable({ exchangeData = [] }) {
   return (
-    <Box>
-      <TableContainer style={{ width: '50%' }} component={Paper}>
+    <Box style={{ width: '50%' }}>
+      <TableContainer style={{ width: '98%' }} component={Paper}>
         <Table>
           <TableHead>
             <TableRow>

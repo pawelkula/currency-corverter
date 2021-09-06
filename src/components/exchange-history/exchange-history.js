@@ -18,6 +18,8 @@ import { format, sub } from 'date-fns';
 import { theme } from '../../theme/theme';
 import { Error } from '../error/error';
 import { ExchangeTable } from '../exchange-table/exchange-table';
+import { ExchangeStatistics } from '../exchange-statistics/exchange-statistics';
+import { arrayAverage } from '../../utils/array';
 
 const GreenRadio = withStyles({
   root: {
@@ -40,11 +42,30 @@ function calculateRatesHistory(data) {
   }
 }
 
+function calculateStatistics(data) {
+  try {
+    const rates = data.map(el => el.rate);
+    const lowest = Math.min(...rates);
+    const highest = Math.max(...rates);
+    const average = arrayAverage(rates);
+
+    return [
+      { label: 'Lowest', rate: lowest },
+      { label: 'Highest', rate: highest },
+      { label: 'Average', rate: average}
+    ];
+  } catch (e) {
+    console.error('Error: Cannot calculate statistics.');
+    return []
+  }
+}
+
 export function ExchangeHistory({ rate, selectedFrom, selectedTo }) {
   const [timeFrame, setTimeFrame] = useState(INITIAL_EXCHANGE_HISTORY_TIME_FRAME);
   const [displayMode, setDisplayMode] = useState(INITIAL_EXCHANGE_DISPLAY_MODE);
   const [errorMessage, setErrorMessage] = useState('');
   const [exchangeData, setExchangeData] = useState([]);
+  const [statisticsData, setStatisticsData] = useState([]);
 
   async function fetchAllExchangeRates(selectedFrom, selectedTo, timeFrame) {
     setErrorMessage('');
@@ -69,15 +90,25 @@ export function ExchangeHistory({ rate, selectedFrom, selectedTo }) {
         .catch(() => setErrorMessage('Error: Cannot fetch exchange rates.')),
     ]);
 
-    return calculateRatesHistory(data);
+    const rateHistory = calculateRatesHistory(data);
+
+    return {
+      history: rateHistory,
+      statistics: calculateStatistics(rateHistory)
+    };
   }
 
   useEffect(() => {
-    if (selectedFrom && selectedTo) {
+    if (selectedFrom && selectedTo && rate !== 0) {
       fetchAllExchangeRates(selectedFrom, selectedTo, timeFrame)
-        .then(data => setExchangeData(data));
+        .then(data => {
+          setExchangeData(data.history);
+          setStatisticsData(data.statistics)
+        });
+    } else {
+      setExchangeData([]);
     }
-  }, [selectedFrom, selectedTo, timeFrame]);
+  }, [selectedFrom, selectedTo, rate, timeFrame]);
 
   function handleSelectChange(e) {
     setTimeFrame(e.target.value);
@@ -132,7 +163,17 @@ export function ExchangeHistory({ rate, selectedFrom, selectedTo }) {
         {
           errorMessage
             ? (<Error message={errorMessage} />)
-            : (<ExchangeTable exchangeData={exchangeData} />)
+            : (<Box
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                width: '100%'
+              }}
+            >
+              <ExchangeTable exchangeData={exchangeData} />
+              <ExchangeStatistics statisticsData={statisticsData} />
+            </Box>)
         }
       </Box>
     </Box>
