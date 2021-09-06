@@ -7,8 +7,8 @@ import currencies from '../../data/currencies.json';
 import { Error } from '../error/error';
 import { ExchangeHistory } from '../exchange-history/exchange-history';
 import { ConversionResult } from '../conversion-result/conversion-result';
-import './panel-converter.css';
 import { LOCAL_STORAGE_KEY } from '../../constants/constants';
+import './panel-converter.css';
 
 function filterExchangeRates(data, currencies) {
   return data.filter((el) => currencies.some(currency => currency === el.currency ? el : false))
@@ -26,7 +26,6 @@ function createHistoryLogItem(amount, from, to) {
     console.error('Cannot create a history log.');
     return null;
   }
-
 }
 
 export function PanelConverter() {
