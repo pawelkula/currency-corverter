@@ -1,5 +1,7 @@
 # Currency exchange - tech assignment
 
+## Task: https://github.com/pawelkula/currency-corverter/blob/master/task/assignemnt.pdf
+
 ## Prerequisites
 Node version: 16.7.0 (should work on other modern versions as well)
 
